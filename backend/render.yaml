@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: kpi99-ppi-f-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: CORS_ORIGINS
+        value: https://diagnostic.kpi99.co,https://kpi99.co
+      - key: UPLOAD_DIR
+        value: ./uploads
+      - key: REPORT_DIR
+        value: ./reports
+
+
+
