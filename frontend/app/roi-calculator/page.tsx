@@ -43,6 +43,11 @@ interface ROIResults {
 const REGIONS = ['LATAM', 'North America', 'Europe', 'Asia Pacific', 'Other']
 const SCENARIOS = ['conservative', 'expected', 'upside']
 
+interface PieDataEntry {
+  name: string
+  value: number
+}
+
 const SCENARIO_DEFAULTS = {
   conservative: {
     cloud_savings_pct: 0.06,
@@ -774,7 +779,7 @@ after engagement completion`}
                             fill="#8884d8"
                             dataKey="value"
                           >
-                            {pieData.map((entry, index) => (
+                            {pieData.map((entry: PieDataEntry, index: number) => (
                               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                             ))}
                           </Pie>

@@ -37,6 +37,14 @@ const DIMENSION_COLORS: Record<string, string> = {
   failure_resilience: '#ef4444',
 }
 
+interface ChartDataEntry {
+  dimension: string
+  dimensionKey: string
+  maturity: number
+  percentage: number
+  color: string
+}
+
 export default function ResultsPage() {
   const params = useParams()
   const assessmentId = parseInt(params.id as string)
@@ -339,7 +347,7 @@ export default function ResultsPage() {
                   ]}
                 />
                 <Bar dataKey="maturity" radius={[8, 8, 0, 0]}>
-                  {chartData.map((entry, index) => (
+                  {chartData.map((entry: ChartDataEntry, index: number) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Bar>
