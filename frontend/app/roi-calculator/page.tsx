@@ -754,7 +754,7 @@ after engagement completion`}
                       tickFormatter={(value: number | undefined) => `$${((value ?? 0) / 1000).toFixed(0)}k`}
                     />
                     <Tooltip 
-                      formatter={(value: number | undefined) => formatCurrency(value ?? 0)}
+                      formatter={(value: any) => formatCurrency(typeof value === 'number' ? value : 0)}
                       contentStyle={{ backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '8px' }}
                     />
                     <Legend />
@@ -790,7 +790,7 @@ after engagement completion`}
                               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                             ))}
                           </Pie>
-                          <Tooltip formatter={(value: number | undefined) => formatCurrency(value ?? 0)} />
+                          <Tooltip formatter={(value: any) => formatCurrency(typeof value === 'number' ? value : 0)} />
                         </PieChart>
                       </ResponsiveContainer>
                     )}
