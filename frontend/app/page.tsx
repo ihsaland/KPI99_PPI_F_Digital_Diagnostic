@@ -30,7 +30,23 @@ export default function Home() {
     } catch (error: any) {
       console.error('Error fetching organizations:', error)
       console.error('Error details:', error.response?.data || error.message)
-      setError('Failed to load organizations. Please check if the backend server is running.')
+      console.error('Error status:', error.response?.status)
+      console.error('Error URL:', error.config?.url)
+      console.error('Full error:', error)
+      
+      // Provide more specific error message
+      let errorMessage = 'Failed to load organizations. '
+      if (error.code === 'ECONNREFUSED' || error.message?.includes('Network Error')) {
+        errorMessage += 'Cannot connect to backend server. Please check if the backend is running and NEXT_PUBLIC_API_URL is set correctly.'
+      } else if (error.response?.status === 404) {
+        errorMessage += 'Backend endpoint not found. Please verify the backend URL is correct.'
+      } else if (error.response?.status === 0 || error.message?.includes('CORS')) {
+        errorMessage += 'CORS error detected. Please check CORS_ORIGINS in Railway backend settings.'
+      } else {
+        errorMessage += 'Please check if the backend server is running.'
+      }
+      
+      setError(errorMessage)
       toast.error('Failed to load organizations')
       setOrganizations([])
     } finally {
