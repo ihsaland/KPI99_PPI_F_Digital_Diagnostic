@@ -90,10 +90,14 @@ export default function ROICalculatorPage() {
   const [loading, setLoading] = useState(false)
   const [showResults, setShowResults] = useState(false)
 
-  const handleInputChange = (field: keyof ROIInputs, value: string | number) => {
+  const handleInputChange = (field: keyof ROIInputs, value: string | number | undefined) => {
     setInputs(prev => ({
       ...prev,
-      [field]: field === 'region' ? value : parseFloat(value as string) || 0
+      [field]: field === 'region' 
+        ? (value as string) 
+        : field === 'ppi_f_maturity_score'
+        ? (value === undefined || value === '' ? undefined : (typeof value === 'number' ? value : parseFloat(value as string) || undefined))
+        : (typeof value === 'number' ? value : parseFloat(value as string) || 0)
     }))
   }
 
@@ -391,7 +395,10 @@ export default function ROICalculatorPage() {
                     <input
                       type="number"
                       value={inputs.ppi_f_maturity_score || ''}
-                      onChange={(e) => handleInputChange('ppi_f_maturity_score', e.target.value ? parseFloat(e.target.value) : undefined)}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        handleInputChange('ppi_f_maturity_score', value === '' ? undefined : parseFloat(value))
+                      }}
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                       placeholder="0.0 - 5.0"
                       min="0"
