@@ -646,13 +646,13 @@ after engagement completion`}
                         <h3 className="font-semibold text-blue-900 mb-2">Cloud Cost Optimization</h3>
                         <div className="text-sm text-blue-700 space-y-1">
                           <div>Annual Cloud Spend: {formatCurrency(inputs.annual_cloud_spend_usd)}</div>
-                          <div>Savings %: {results.expected.cloud_savings_pct}%</div>
+                          <div>Savings %: {(results.expected.cloud_savings_pct ?? 0) * 100}%</div>
                           <div>Realization: {(results.expected.realization_factor * 100).toFixed(0)}%</div>
                           <div className="pt-2 border-t border-blue-300">
                             <strong>Impact:</strong> {formatCurrency(results.expected.cloud_impact)}
                           </div>
                           <div className="text-xs text-blue-600 mt-1 font-mono">
-                            {formatCurrency(inputs.annual_cloud_spend_usd)} × {results.expected.cloud_savings_pct}% × {(results.expected.realization_factor * 100).toFixed(0)}%
+                            {formatCurrency(inputs.annual_cloud_spend_usd)} × {(results.expected.cloud_savings_pct ?? 0) * 100}% × {(results.expected.realization_factor * 100).toFixed(0)}%
                           </div>
                         </div>
                       </div>
@@ -660,13 +660,13 @@ after engagement completion`}
                         <h3 className="font-semibold text-green-900 mb-2">Incident Reduction</h3>
                         <div className="text-sm text-green-700 space-y-1">
                           <div>Annual Incident Cost: {formatCurrency(inputs.critical_incidents_per_month * inputs.avg_cost_per_incident_usd * 12)}</div>
-                          <div>Reduction %: {results.expected.incident_reduction_pct}%</div>
+                          <div>Reduction %: {(results.expected.incident_reduction_pct ?? 0) * 100}%</div>
                           <div>Realization: {(results.expected.realization_factor * 100).toFixed(0)}%</div>
                           <div className="pt-2 border-t border-green-300">
                             <strong>Impact:</strong> {formatCurrency(results.expected.incident_impact)}
                           </div>
                           <div className="text-xs text-green-600 mt-1 font-mono">
-                            {formatCurrency(inputs.critical_incidents_per_month * inputs.avg_cost_per_incident_usd * 12)} × {results.expected.incident_reduction_pct}% × {(results.expected.realization_factor * 100).toFixed(0)}%
+                            {formatCurrency(inputs.critical_incidents_per_month * inputs.avg_cost_per_incident_usd * 12)} × {(results.expected.incident_reduction_pct ?? 0) * 100}% × {(results.expected.realization_factor * 100).toFixed(0)}%
                           </div>
                         </div>
                       </div>
@@ -676,13 +676,13 @@ after engagement completion`}
                         <h3 className="font-semibold text-purple-900 mb-2">Revenue Protection</h3>
                         <div className="text-sm text-purple-700 space-y-1">
                           <div>Annual Revenue at Risk: {formatCurrency(inputs.monthly_revenue_at_risk_usd * 12)}</div>
-                          <div>Mitigation %: {results.expected.revenue_mitigated_pct}%</div>
+                          <div>Mitigation %: {(results.expected.revenue_mitigated_pct ?? 0) * 100}%</div>
                           <div>Realization: {(results.expected.realization_factor * 100).toFixed(0)}%</div>
                           <div className="pt-2 border-t border-purple-300">
                             <strong>Impact:</strong> {formatCurrency(results.expected.revenue_impact)}
                           </div>
                           <div className="text-xs text-purple-600 mt-1 font-mono">
-                            {formatCurrency(inputs.monthly_revenue_at_risk_usd * 12)} × {results.expected.revenue_mitigated_pct}% × {(results.expected.realization_factor * 100).toFixed(0)}%
+                            {formatCurrency(inputs.monthly_revenue_at_risk_usd * 12)} × {(results.expected.revenue_mitigated_pct ?? 0) * 100}% × {(results.expected.realization_factor * 100).toFixed(0)}%
                           </div>
                         </div>
                       </div>
@@ -690,13 +690,13 @@ after engagement completion`}
                         <h3 className="font-semibold text-orange-900 mb-2">Productivity Recovery</h3>
                         <div className="text-sm text-orange-700 space-y-1">
                           <div>Annual Engineering Cost: {formatCurrency(inputs.monthly_engineering_cost_usd * 12)}</div>
-                          <div>Recovery %: {results.expected.productivity_recovery_pct}%</div>
+                          <div>Recovery %: {(results.expected.productivity_recovery_pct ?? 0) * 100}%</div>
                           <div>Realization: {(results.expected.realization_factor * 100).toFixed(0)}%</div>
                           <div className="pt-2 border-t border-orange-300">
                             <strong>Impact:</strong> {formatCurrency(results.expected.productivity_impact)}
                           </div>
                           <div className="text-xs text-orange-600 mt-1 font-mono">
-                            {formatCurrency(inputs.monthly_engineering_cost_usd * 12)} × {results.expected.productivity_recovery_pct}% × {(results.expected.realization_factor * 100).toFixed(0)}%
+                            {formatCurrency(inputs.monthly_engineering_cost_usd * 12)} × {(results.expected.productivity_recovery_pct ?? 0) * 100}% × {(results.expected.realization_factor * 100).toFixed(0)}%
                           </div>
                         </div>
                       </div>
@@ -744,10 +744,10 @@ after engagement completion`}
                     <XAxis dataKey="scenario" tick={{ fill: '#475569', fontSize: 12 }} />
                     <YAxis 
                       tick={{ fill: '#475569', fontSize: 12 }}
-                      tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                      tickFormatter={(value: number | undefined) => `$${((value ?? 0) / 1000).toFixed(0)}k`}
                     />
                     <Tooltip 
-                      formatter={(value: number) => formatCurrency(value)}
+                      formatter={(value: number | undefined) => formatCurrency(value ?? 0)}
                       contentStyle={{ backgroundColor: 'white', border: '1px solid #e2e8f0', borderRadius: '8px' }}
                     />
                     <Legend />
@@ -774,7 +774,7 @@ after engagement completion`}
                             cx="50%"
                             cy="50%"
                             labelLine={false}
-                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                            label={({ name, percent }: { name: string; percent?: number }) => `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
                             outerRadius={80}
                             fill="#8884d8"
                             dataKey="value"
@@ -783,7 +783,7 @@ after engagement completion`}
                               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                             ))}
                           </Pie>
-                          <Tooltip formatter={(value: number) => formatCurrency(value)} />
+                          <Tooltip formatter={(value: number | undefined) => formatCurrency(value ?? 0)} />
                         </PieChart>
                       </ResponsiveContainer>
                     )}
