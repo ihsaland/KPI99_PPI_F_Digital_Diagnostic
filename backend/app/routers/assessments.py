@@ -29,11 +29,15 @@ def create_assessment(
             raise HTTPException(status_code=404, detail="Organization not found")
         
         # Create assessment with explicit field mapping
+        tags = getattr(assessment, "tags", None) or []
+        custom_fields = getattr(assessment, "custom_fields", None)
         db_assessment = models.Assessment(
             organization_id=assessment.organization_id,
             name=assessment.name,
             version=assessment.version or "1.0",
-            status="draft"
+            status="draft",
+            tags=tags if isinstance(tags, list) else None,
+            custom_fields=custom_fields,
         )
         db.add(db_assessment)
         db.commit()

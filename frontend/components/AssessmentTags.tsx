@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { assessmentsApi } from '@/lib/api'
+import { STRATEGIC_INITIATIVES, getInitiativeLabel, isStrategicInitiativeTag } from '@/lib/strategicInitiatives'
 import toast from 'react-hot-toast'
 
 interface AssessmentTagsProps {
@@ -56,6 +57,25 @@ export default function AssessmentTags({ assessmentId, initialTags }: Assessment
       
       {isEditing ? (
         <div className="space-y-3">
+          <div>
+            <p className="text-sm font-medium text-slate-700 mb-2">Strategic initiatives (optional)</p>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {STRATEGIC_INITIATIVES.map((init) => (
+                <button
+                  key={init.tag}
+                  type="button"
+                  onClick={() => {
+                    if (tags.includes(init.tag)) return
+                    handleSaveTags([...tags, init.tag])
+                  }}
+                  disabled={tags.includes(init.tag)}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {tags.includes(init.tag) ? '✓ ' : ''}{init.label}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="flex gap-2">
             <input
               type="text"
@@ -77,9 +97,9 @@ export default function AssessmentTags({ assessmentId, initialTags }: Assessment
               {tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"
+                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm ${isStrategicInitiativeTag(tag) ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-700'}`}
                 >
-                  {tag}
+                  {isStrategicInitiativeTag(tag) ? getInitiativeLabel(tag) : tag}
                   <button
                     onClick={() => handleRemoveTag(tag)}
                     className="ml-2 text-blue-700 hover:text-blue-900"
@@ -97,9 +117,9 @@ export default function AssessmentTags({ assessmentId, initialTags }: Assessment
             tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"
+                className={`inline-flex items-center px-3 py-1 rounded-full text-sm ${isStrategicInitiativeTag(tag) ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-700'}`}
               >
-                {tag}
+                {isStrategicInitiativeTag(tag) ? getInitiativeLabel(tag) : tag}
               </span>
             ))
           ) : (

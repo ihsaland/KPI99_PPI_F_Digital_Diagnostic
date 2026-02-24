@@ -3,6 +3,7 @@ import { Manrope } from 'next/font/google'
 import './globals.css'
 import ErrorBoundaryWrapper from '@/components/ErrorBoundaryWrapper'
 import Footer from '@/components/Footer'
+import GoogleAnalytics from '@/components/GoogleAnalytics'
 
 const manrope = Manrope({ 
   subsets: ['latin'],
@@ -28,6 +29,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body>
+        <GoogleAnalytics />
         <a href="#main-content" className="skip-to-main">
           Skip to main content
         </a>

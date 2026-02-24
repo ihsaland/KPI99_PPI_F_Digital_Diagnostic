@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { organizationsApi, assessmentsApi, Assessment } from '@/lib/api'
+import { STRATEGIC_INITIATIVES, getInitiativeLabel } from '@/lib/strategicInitiatives'
 import toast from 'react-hot-toast'
 import Header from '@/components/Header'
 import PanAbstract from '@/components/panAbstract'
@@ -20,6 +21,7 @@ export default function AssessmentsPage() {
   const [assessments, setAssessments] = useState<Assessment[]>([])
   const [loading, setLoading] = useState(true)
   const [newAssessmentName, setNewAssessmentName] = useState('')
+  const [newAssessmentInitiative, setNewAssessmentInitiative] = useState<string>('')
   const [showNewForm, setShowNewForm] = useState(false)
   const [cloningId, setCloningId] = useState<number | null>(null)
   const [filters, setFilters] = useState<{ status?: string; search?: string }>({})
@@ -63,9 +65,11 @@ export default function AssessmentsPage() {
     try {
       console.log('Creating assessment:', { organization_id: organizationId, name: newAssessmentName.trim() })
       
+      const tags = newAssessmentInitiative ? [newAssessmentInitiative] : undefined
       const response = await assessmentsApi.create({
         organization_id: organizationId,
         name: newAssessmentName.trim(),
+        tags,
       })
       
       console.log('Assessment created successfully:', response.data)
@@ -73,6 +77,7 @@ export default function AssessmentsPage() {
       const newAssessment = response.data
       toast.success('Assessment created! Redirecting...')
       setNewAssessmentName('')
+      setNewAssessmentInitiative('')
       setShowNewForm(false)
       
       // Small delay to show the success message
@@ -219,17 +224,33 @@ export default function AssessmentsPage() {
 
           {showNewForm && (
             <div className="px-8 py-6 border-b border-slate-200 bg-blue-50">
-              <form onSubmit={handleCreateAssessment} className="flex gap-4">
-                <input
-                  type="text"
-                  value={newAssessmentName}
-                  onChange={(e) => setNewAssessmentName(e.target.value)}
-                  placeholder="PPI-F Diagnostic name (e.g., Q1 2024 Engineering Maturity)"
-                  required
-                  disabled={creating}
-                  className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none disabled:bg-slate-100 disabled:cursor-not-allowed"
-                />
-                <button
+              <form onSubmit={handleCreateAssessment} className="space-y-4">
+                <div className="flex flex-wrap gap-4 items-end">
+                  <input
+                    type="text"
+                    value={newAssessmentName}
+                    onChange={(e) => setNewAssessmentName(e.target.value)}
+                    placeholder="PPI-F Diagnostic name (e.g., Q1 2024 Engineering Maturity)"
+                    required
+                    disabled={creating}
+                    className="flex-1 min-w-[200px] px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none disabled:bg-slate-100 disabled:cursor-not-allowed"
+                  />
+                  <div className="flex flex-col gap-1">
+                    <label htmlFor="initiative" className="text-sm font-medium text-slate-700">Strategic initiative (optional)</label>
+                    <select
+                      id="initiative"
+                      value={newAssessmentInitiative}
+                      onChange={(e) => setNewAssessmentInitiative(e.target.value)}
+                      disabled={creating}
+                      className="px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none disabled:bg-slate-100 disabled:cursor-not-allowed min-w-[220px]"
+                    >
+                      <option value="">None</option>
+                      {STRATEGIC_INITIATIVES.map((init) => (
+                        <option key={init.tag} value={init.tag}>{init.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <button
                   type="submit"
                   disabled={creating || !newAssessmentName.trim()}
                   className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
@@ -246,6 +267,7 @@ export default function AssessmentsPage() {
                     'Create'
                   )}
                 </button>
+                </div>
               </form>
             </div>
           )}
@@ -294,6 +316,11 @@ export default function AssessmentsPage() {
                         <p className="text-sm text-slate-500">
                           Created {new Date(assessment.created_at).toLocaleDateString()}
                         </p>
+                        {assessment.tags?.length && assessment.tags.some((t) => STRATEGIC_INITIATIVES.some((i) => i.tag === t)) && (
+                          <p className="text-xs text-slate-600 mt-1">
+                            Initiative: {getInitiativeLabel(assessment.tags.find((t) => STRATEGIC_INITIATIVES.some((i) => i.tag === t))!)}
+                          </p>
+                        )}
                       </div>
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         assessment.status === 'completed' 

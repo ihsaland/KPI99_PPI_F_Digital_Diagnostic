@@ -2,7 +2,7 @@
 Migration script to add API key fields to Organization model
 Run this once to update existing database
 """
-from sqlalchemy import text
+from sqlalchemy import text, inspect
 from app.database import engine, SessionLocal
 import sys
 
@@ -11,8 +11,8 @@ def migrate():
     db = SessionLocal()
     try:
         # Check if columns already exist
-        inspector = engine.dialect.get_columns(engine, "organizations")
-        existing_columns = [col['name'] for col in inspector]
+        inspector = inspect(engine)
+        existing_columns = [col['name'] for col in inspector.get_columns("organizations")]
         
         migrations = []
         
@@ -29,6 +29,9 @@ def migrate():
         
         if 'is_active' not in existing_columns:
             migrations.append("ALTER TABLE organizations ADD COLUMN is_active BOOLEAN DEFAULT 1")
+        
+        if 'updated_at' not in existing_columns:
+            migrations.append("ALTER TABLE organizations ADD COLUMN updated_at DATETIME")
         
         if migrations:
             print("Running migrations...")
@@ -54,6 +57,7 @@ def migrate():
 
 if __name__ == "__main__":
     migrate()
+
 
 
 

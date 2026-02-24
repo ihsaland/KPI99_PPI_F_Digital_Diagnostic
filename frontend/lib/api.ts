@@ -29,12 +29,6 @@ const api = axios.create({
   timeout: 30000, // 30 second timeout
 })
 
-// Log API configuration for debugging (only in browser)
-if (typeof window !== 'undefined') {
-  console.log('API Base URL:', API_BASE)
-  console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL || 'Not set')
-}
-
 // Add API key interceptor (if stored in localStorage)
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
@@ -157,8 +151,13 @@ export const assessmentsApi = {
       },
     }),
   get: (id: number) => api.get<Assessment>(`/api/assessments/${id}`),
-  create: (data: { organization_id: number; name: string; version?: string }) =>
-    api.post<Assessment>('/api/assessments', data),
+  create: (data: {
+    organization_id: number
+    name: string
+    version?: string
+    tags?: string[]
+    custom_fields?: Record<string, any>
+  }) => api.post<Assessment>('/api/assessments', data),
   clone: (assessmentId: number, newName?: string) =>
     api.post<Assessment>(`/api/assessments/${assessmentId}/clone?new_name=${encodeURIComponent(newName || '')}`),
   getAnswers: (assessmentId: number) =>

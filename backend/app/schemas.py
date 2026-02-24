@@ -29,6 +29,8 @@ class AssessmentBase(BaseModel):
 
 class AssessmentCreate(AssessmentBase):
     organization_id: int
+    tags: Optional[List[str]] = None
+    custom_fields: Optional[Dict[str, Any]] = None
 
 class Assessment(AssessmentBase):
     id: int
