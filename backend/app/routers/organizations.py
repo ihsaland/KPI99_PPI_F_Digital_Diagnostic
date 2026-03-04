@@ -45,9 +45,8 @@ def create_organization(
     db.refresh(db_org)
     return db_org
 
-@router.get("/", response_model=List[schemas.Organization])
-def list_organizations(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    """List all organizations"""
+def _list_organizations_impl(skip: int, limit: int, db: Session) -> List[models.Organization]:
+    """Shared implementation for list (used by both / and "" to avoid 307 redirect)."""
     try:
         orgs = db.query(models.Organization).offset(skip).limit(limit).all()
         return orgs
@@ -55,11 +54,9 @@ def list_organizations(skip: int = 0, limit: int = 100, db: Session = Depends(ge
         import traceback
         print(f"Error listing organizations: {str(e)}")
         print(traceback.format_exc())
-        # If there's a database error (e.g., missing tables), try to create them
         try:
             from app.database import Base, engine
             Base.metadata.create_all(bind=engine)
-            # Retry the query
             orgs = db.query(models.Organization).offset(skip).limit(limit).all()
             return orgs
         except Exception as e2:
@@ -67,6 +64,18 @@ def list_organizations(skip: int = 0, limit: int = 100, db: Session = Depends(ge
             print(f"Database error after retry: {str(e2)}")
             print(traceback.format_exc())
             raise HTTPException(status_code=500, detail=f"Database error: {str(e2)}")
+
+
+@router.get("", response_model=List[schemas.Organization])
+def list_organizations_no_slash(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    """List all organizations (path without trailing slash to avoid 307 redirect)."""
+    return _list_organizations_impl(skip, limit, db)
+
+
+@router.get("/", response_model=List[schemas.Organization])
+def list_organizations(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    """List all organizations."""
+    return _list_organizations_impl(skip, limit, db)
 
 @router.get("/{organization_id}", response_model=schemas.Organization)
 def get_organization(organization_id: int, db: Session = Depends(get_db)):
