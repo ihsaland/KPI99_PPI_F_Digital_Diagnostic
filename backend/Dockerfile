@@ -17,11 +17,11 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p uploads reports data
 
-# Expose port
-EXPOSE 8001
+# PORT is set by Railway/Render at runtime
+EXPOSE 8000
 
-# Run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8001"]
+# Use start.py so PORT env var is read correctly (avoids "$PORT" literal error)
+CMD ["python", "start.py"]
 
 
 

@@ -35,15 +35,20 @@ export default function Home() {
       console.error('Full error:', error)
       
       // Provide more specific error message
+      const isProduction = typeof window !== 'undefined' && !window.location.hostname.match(/^localhost|127\.0\.0\.1$/)
       let errorMessage = 'Failed to load organizations. '
       if (error.code === 'ECONNREFUSED' || error.message?.includes('Network Error')) {
-        errorMessage += 'Cannot connect to backend server. Please check if the backend is running and NEXT_PUBLIC_API_URL is set correctly.'
+        errorMessage += isProduction
+          ? 'In production, set NEXT_PUBLIC_API_URL in Vercel to your backend URL (e.g. Railway) and redeploy. See DEPLOYMENT_TROUBLESHOOTING.md.'
+          : 'Cannot connect to backend server. Please check if the backend is running and NEXT_PUBLIC_API_URL is set correctly.'
       } else if (error.response?.status === 404) {
-        errorMessage += 'Backend endpoint not found. Please verify the backend URL is correct.'
+        errorMessage += 'Backend endpoint not found. Verify NEXT_PUBLIC_API_URL points to your API (e.g. https://your-app.railway.app).'
       } else if (error.response?.status === 0 || error.message?.includes('CORS')) {
-        errorMessage += 'CORS error detected. Please check CORS_ORIGINS in Railway backend settings.'
+        errorMessage += 'CORS error detected. Check CORS_ORIGINS on the backend includes your frontend domain.'
       } else {
-        errorMessage += 'Please check if the backend server is running.'
+        errorMessage += isProduction
+          ? 'Set NEXT_PUBLIC_API_URL in Vercel to your backend URL and redeploy.'
+          : 'Please check if the backend server is running.'
       }
       
       setError(errorMessage)

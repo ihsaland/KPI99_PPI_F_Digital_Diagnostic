@@ -1,4 +1,23 @@
-# Local changes not showing in production
+# Deployment troubleshooting
+
+## "Error loading organizations" / "Failed to load organizations" in production
+
+The frontend calls the backend via Next.js **rewrites**: requests to `/api/*` are proxied to the URL in **`NEXT_PUBLIC_API_URL`**. If that variable is **not set in Vercel** (or is wrong), the rewrite points to `http://localhost:8001`, which does not exist in production, so the request fails.
+
+**Fix:**
+
+1. **Vercel** → Your project → **Settings** → **Environment Variables**
+2. Add (or update):
+   - **Name:** `NEXT_PUBLIC_API_URL`
+   - **Value:** your production backend URL, e.g. `https://your-app.up.railway.app` (no trailing slash)
+   - **Environment:** Production (and Preview if you use it)
+3. **Redeploy** so the new value is used at build time: **Deployments** → latest → **⋯** → **Redeploy**
+
+Also ensure the **backend** (e.g. Railway) is running and reachable: open `https://your-backend-url/api/health` in a browser; you should see `{"status":"healthy"}`.
+
+---
+
+## Local changes not showing in production
 
 If you pushed to Git but production (e.g. diagnostic.kpi99.co) still shows old content, check the following.
 
