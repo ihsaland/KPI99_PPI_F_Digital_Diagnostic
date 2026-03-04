@@ -16,10 +16,12 @@ async function computeToken(secret: string): Promise<string> {
     key,
     new TextEncoder().encode('granted')
   )
-  return btoa(String.fromCharCode(...new Uint8Array(sig)))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '')
+  const bytes = new Uint8Array(sig)
+  let binary = ''
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
 
 export async function middleware(request: NextRequest) {
