@@ -25,6 +25,7 @@ class Organization(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
     domain = Column(String(255))
+    industry = Column(String(100), nullable=True, index=True)  # For PPI industry normalization
     subdomain = Column(String(255), unique=True, nullable=True, index=True)  # For subdomain routing
     api_key = Column(String(255), unique=True, nullable=True, index=True)  # API key for access
     api_key_created_at = Column(DateTime(timezone=True), nullable=True)
@@ -57,6 +58,7 @@ class Assessment(Base):
     findings = relationship("Finding", back_populates="assessment", cascade="all, delete-orphan")
     recommendations = relationship("Recommendation", back_populates="assessment", cascade="all, delete-orphan")
     notifications = relationship("Notification", back_populates="assessment")
+    telemetry_uploads = relationship("TelemetryUpload", back_populates="assessment", cascade="all, delete-orphan")
 
 class Question(Base):
     __tablename__ = "questions"
@@ -137,7 +139,7 @@ class Recommendation(Base):
 
 class Artifact(Base):
     __tablename__ = "artifacts"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     assessment_id = Column(Integer, ForeignKey("assessments.id"), nullable=False)
     filename = Column(String(255), nullable=False)
@@ -145,6 +147,23 @@ class Artifact(Base):
     file_type = Column(String(100))
     file_size = Column(Integer)
     uploaded_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class TelemetryUpload(Base):
+    """Optional telemetry data (e.g. CSV) linked to an assessment for future insights."""
+    __tablename__ = "telemetry_uploads"
+
+    id = Column(Integer, primary_key=True, index=True)
+    assessment_id = Column(Integer, ForeignKey("assessments.id"), nullable=False)
+    source_type = Column(String(50), nullable=False, default="csv")  # csv, future: prometheus, datadog, etc.
+    filename = Column(String(255), nullable=False)
+    row_count = Column(Integer, default=0)
+    columns = Column(JSON, nullable=True)  # List of column names
+    parsed_data = Column(JSON, nullable=True)  # Sample rows + optional summary (stored for display/analytics)
+    summary = Column(JSON, nullable=True)  # Optional: aggregates (e.g. avg, min, max by metric)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    assessment = relationship("Assessment", back_populates="telemetry_uploads")
 
 class Webhook(Base):
     __tablename__ = "webhooks"

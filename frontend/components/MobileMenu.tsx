@@ -68,8 +68,8 @@ export default function MobileMenu({ organizationId }: MobileMenuProps) {
                 <Link
                   href={link.href}
                   onClick={() => setIsOpen(false)}
-                  className={`block w-full text-slate-700 no-underline font-medium transition-colors ${
-                    active ? 'text-blue-600' : 'text-slate-700 hover:text-blue-600'
+                  className={`block w-full no-underline font-medium transition-colors ${
+                    active ? 'text-blue-600' : 'text-[#334155] hover:text-blue-600'
                   }`}
                 >
                   {link.label}
@@ -77,6 +77,17 @@ export default function MobileMenu({ organizationId }: MobileMenuProps) {
               </li>
             )
           })}
+          <li className="w-full py-3 border-b border-slate-200">
+            <a
+              href="https://kpi99.co/es/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full no-underline font-medium text-[#334155] hover:text-blue-600 transition-colors"
+              onClick={() => setIsOpen(false)}
+            >
+              Español
+            </a>
+          </li>
         </ul>
       )}
     </>

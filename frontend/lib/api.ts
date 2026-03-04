@@ -1,22 +1,12 @@
 import axios from 'axios'
 
-// Determine API base URL
-// For Vercel: Use environment variable pointing to Railway/Render backend
-// For local dev: Use localhost
-// Vercel rewrites will handle /api/* requests if NEXT_PUBLIC_API_URL is not set
+// API base URL: use same origin so Next.js rewrites proxy /api/* to the backend.
+// Set NEXT_PUBLIC_API_URL in Vercel (and locally) to your backend URL; rewrites use it at build time.
 const getApiBase = () => {
-  // Use environment variable if set (for Vercel deployment)
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL
-  }
-  
-  // For local development or if no env var, use same origin
   if (typeof window !== 'undefined') {
-    return `${window.location.origin}/api`
+    return '' // same origin; rewrites send /api/* to backend
   }
-  
-  // Server-side fallback
-  return 'http://localhost:8001'
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
 }
 
 const API_BASE = getApiBase()
@@ -44,7 +34,13 @@ export interface Organization {
   id: number
   name: string
   domain?: string
+  industry?: string | null
   created_at: string
+}
+
+export interface IndustryOption {
+  value: string
+  label: string
 }
 
 export interface Assessment {
@@ -137,8 +133,25 @@ export interface Recommendation {
 export const organizationsApi = {
   list: () => api.get<Organization[]>('/api/organizations/'),
   get: (id: number) => api.get<Organization>(`/api/organizations/${id}`),
-  create: (data: { name: string; domain?: string }) =>
+  create: (data: { name: string; domain?: string; industry?: string }) =>
     api.post<Organization>('/api/organizations/', data),
+  update: (id: number, data: { name?: string; domain?: string; industry?: string | null }) =>
+    api.patch<Organization>(`/api/organizations/${id}`, data),
+}
+
+export interface TelemetryUploadSummary {
+  id: number
+  assessment_id: number
+  source_type: string
+  filename: string
+  row_count: number
+  columns: string[] | null
+  created_at: string | null
+}
+
+export interface TelemetryUploadDetail extends TelemetryUploadSummary {
+  parsed_data?: Record<string, unknown>[] | null
+  summary?: Record<string, unknown> | null
 }
 
 export const assessmentsApi = {
@@ -181,6 +194,20 @@ export const assessmentsApi = {
     api.patch(`/api/assessments/${assessmentId}/custom-fields`, customFields),
 }
 
+export const telemetryApi = {
+  list: (assessmentId: number) =>
+    api.get<TelemetryUploadSummary[]>(`/api/assessments/${assessmentId}/telemetry`),
+  uploadCsv: (assessmentId: number, file: File) => {
+    const form = new FormData()
+    form.append('file', file)
+    return api.post<TelemetryUploadDetail>(`/api/assessments/${assessmentId}/telemetry/upload`, form)
+  },
+  get: (assessmentId: number, uploadId: number) =>
+    api.get<TelemetryUploadDetail>(`/api/assessments/${assessmentId}/telemetry/${uploadId}`),
+  delete: (assessmentId: number, uploadId: number) =>
+    api.delete(`/api/assessments/${assessmentId}/telemetry/${uploadId}`),
+}
+
 export const recommendationsApi = {
   list: (assessmentId: number, status?: string) =>
     api.get<Recommendation[]>(`/api/recommendations/${assessmentId}`, {
@@ -200,6 +227,7 @@ export const aiDiagnosticsApi = {
 }
 
 export const analyticsApi = {
+  getIndustries: () => api.get<IndustryOption[]>('/api/analytics/industries'),
   getTrends: (organizationId: number) =>
     api.get(`/api/analytics/organization/${organizationId}/trends`),
   getMetrics: (organizationId: number) =>

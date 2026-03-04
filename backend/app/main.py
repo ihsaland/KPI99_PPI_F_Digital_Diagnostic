@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 import os
 
 from app.database import engine, Base
-from app.routers import assessments, questions, organizations, reports, uploads, recommendations, analytics, bulk_operations, webhooks, notifications, roi
+from app.routers import assessments, questions, organizations, reports, uploads, recommendations, analytics, bulk_operations, webhooks, notifications, roi, telemetry
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -45,6 +45,7 @@ app.add_middleware(
 # Include routers
 app.include_router(organizations.router, prefix="/api/organizations", tags=["organizations"])
 app.include_router(assessments.router, prefix="/api/assessments", tags=["assessments"])
+app.include_router(telemetry.router, prefix="/api/assessments", tags=["telemetry"])
 app.include_router(questions.router, prefix="/api/questions", tags=["questions"])
 app.include_router(reports.router, prefix="/api/reports", tags=["reports"])
 app.include_router(uploads.router, prefix="/api/uploads", tags=["uploads"])

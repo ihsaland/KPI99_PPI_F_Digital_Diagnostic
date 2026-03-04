@@ -9,6 +9,7 @@ from app.database import get_db
 from app import models, schemas
 from app.middleware.security import validate_organization_name, sanitize_string
 from app.middleware.auth import generate_api_key
+from app.industry_benchmarks import INDUSTRY_BENCHMARKS
 from datetime import datetime
 
 router = APIRouter()
@@ -29,10 +30,15 @@ def create_organization(
     # Sanitize inputs
     sanitized_name = sanitize_string(organization.name)
     sanitized_domain = sanitize_string(organization.domain) if organization.domain else None
-    
+    industry_key = None
+    if organization.industry and organization.industry.strip():
+        key = organization.industry.strip().lower().replace(" ", "_")
+        industry_key = key if key in INDUSTRY_BENCHMARKS else None
+
     db_org = models.Organization(
         name=sanitized_name,
-        domain=sanitized_domain
+        domain=sanitized_domain,
+        industry=industry_key
     )
     db.add(db_org)
     db.commit()
@@ -68,6 +74,32 @@ def get_organization(organization_id: int, db: Session = Depends(get_db)):
     org = db.query(models.Organization).filter(models.Organization.id == organization_id).first()
     if not org:
         raise HTTPException(status_code=404, detail="Organization not found")
+    return org
+
+@router.patch("/{organization_id}", response_model=schemas.Organization)
+def update_organization(
+    organization_id: int,
+    payload: schemas.OrganizationUpdate,
+    db: Session = Depends(get_db),
+):
+    """Update organization (name, domain, industry)."""
+    org = db.query(models.Organization).filter(models.Organization.id == organization_id).first()
+    if not org:
+        raise HTTPException(status_code=404, detail="Organization not found")
+    if payload.name is not None:
+        if not validate_organization_name(payload.name):
+            raise HTTPException(status_code=400, detail="Invalid organization name.")
+        org.name = sanitize_string(payload.name)
+    if payload.domain is not None:
+        org.domain = sanitize_string(payload.domain) if payload.domain else None
+    if payload.industry is not None:
+        if payload.industry.strip():
+            key = payload.industry.strip().lower().replace(" ", "_")
+            org.industry = key if key in INDUSTRY_BENCHMARKS else None
+        else:
+            org.industry = None
+    db.commit()
+    db.refresh(org)
     return org
 
 @router.post("/{organization_id}/generate-api-key")

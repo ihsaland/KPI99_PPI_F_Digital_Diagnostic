@@ -9,8 +9,16 @@ from datetime import datetime, timedelta
 
 from app.database import get_db
 from app import models
+from app.industry_benchmarks import get_industry_baseline, get_industry_label, list_industries
 
 router = APIRouter()
+
+
+@router.get("/industries")
+def get_industries():
+    """List industries used for PPI industry normalization (for dropdowns)."""
+    return list_industries()
+
 
 @router.get("/organization/{organization_id}/trends")
 def get_organization_trends(organization_id: int, db: Session = Depends(get_db)):
@@ -122,44 +130,48 @@ def get_organization_metrics(organization_id: int, db: Session = Depends(get_db)
 
 @router.get("/organization/{organization_id}/benchmark")
 def get_organization_benchmark(organization_id: int, db: Session = Depends(get_db)):
-    """Get benchmark comparison for an organization"""
-    # Get organization's latest assessment
+    """Get benchmark comparison for an organization, normalized by industry when set."""
+    org = db.query(models.Organization).filter(models.Organization.id == organization_id).first()
+    if not org:
+        raise HTTPException(status_code=404, detail="Organization not found")
+
     latest_assessment = db.query(models.Assessment).filter(
         models.Assessment.organization_id == organization_id,
         models.Assessment.status == "completed"
     ).order_by(desc(models.Assessment.completed_at)).first()
-    
+
     if not latest_assessment:
         return {
             "organization_id": organization_id,
             "message": "No completed assessments found"
         }
-    
+
     latest_scores = db.query(models.Score).filter(
         models.Score.assessment_id == latest_assessment.id
     ).all()
-    
+
     if not latest_scores:
         return {
             "organization_id": organization_id,
             "message": "No scores found for latest assessment"
         }
-    
-    # Calculate industry averages (simplified - in production, this would use real benchmark data)
-    # For now, we'll use a baseline of 3.0 as "industry average"
-    industry_average = 3.0
-    
+
+    industry_average = get_industry_baseline(org.industry)
+    industry_label = get_industry_label(org.industry)
+
     organization_scores = {
         str(s.dimension.value): s.maturity_score for s in latest_scores
     }
     overall_maturity = sum(s.maturity_score for s in latest_scores) / len(latest_scores)
-    
+
     return {
         "organization_id": organization_id,
         "assessment_id": latest_assessment.id,
         "assessment_name": latest_assessment.name,
         "overall_maturity": overall_maturity,
         "industry_average": industry_average,
+        "industry": org.industry,
+        "industry_label": industry_label,
         "vs_industry": overall_maturity - industry_average,
         "dimension_scores": organization_scores,
         "dimension_benchmarks": {

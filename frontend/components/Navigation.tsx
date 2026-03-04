@@ -34,8 +34,8 @@ export default function Navigation({ organizationId }: NavigationProps) {
             <li key={link.href}>
               <Link
                 href={link.href}
-                className={`nav-link text-slate-700 no-underline font-medium transition-colors relative ${
-                  active ? 'text-blue-600' : 'text-slate-700 hover:text-blue-600'
+                className={`nav-link no-underline font-medium transition-colors relative ${
+                  active ? 'text-blue-600' : 'text-[#334155] hover:text-blue-600'
                 }`}
               >
                 {link.label}
@@ -52,7 +52,7 @@ export default function Navigation({ organizationId }: NavigationProps) {
                 className={`nav-link text-slate-700 no-underline font-medium transition-colors relative ${
                   isActive(`/organizations/${organizationId}/assessments`)
                     ? 'text-blue-600'
-                    : 'text-slate-700 hover:text-blue-600'
+                    : 'text-[#334155] hover:text-blue-600'
                 }`}
               >
                 Assessments
@@ -64,7 +64,7 @@ export default function Navigation({ organizationId }: NavigationProps) {
                 className={`nav-link text-slate-700 no-underline font-medium transition-colors relative ${
                   isActive(`/organizations/${organizationId}/analytics`)
                     ? 'text-blue-600'
-                    : 'text-slate-700 hover:text-blue-600'
+                    : 'text-[#334155] hover:text-blue-600'
                 }`}
               >
                 Analytics

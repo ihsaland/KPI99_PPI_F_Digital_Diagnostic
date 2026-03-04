@@ -28,7 +28,23 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Hero / header image — KPI99 format (gradient + panAbstract, fixed attachment) */
+.hero {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.7) 0%, rgba(59, 130, 246, 0.6) 100%), url("/panAbstract.png");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  padding: 120px 0 80px;
+}
+@media (max-width: 768px) {
+  .hero {
+    padding: 100px 0 60px;
+    background-attachment: scroll;
   }
 }
 

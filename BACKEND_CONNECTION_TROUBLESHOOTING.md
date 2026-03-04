@@ -2,7 +2,15 @@
 
 ## Error: "Failed to load organizations. Please check if the backend server is running."
 
-This error means the frontend cannot connect to the Railway backend API.
+This error means the frontend cannot connect to the backend API.
+
+**How production works:** The frontend calls `/api/*` on the same origin (e.g. `https://diagnostic.kpi99.co/api/...`). Next.js rewrites proxy those requests to the URL in `NEXT_PUBLIC_API_URL`. So **you must set `NEXT_PUBLIC_API_URL` in Vercel** (e.g. to your Railway backend URL). The value is used at **build time** for the proxy; the browser never talks to the backend directly, which avoids CORS issues.
+
+## "Production backend is not responding"
+
+1. **Set and redeploy:** In Vercel, set `NEXT_PUBLIC_API_URL` to your backend URL (e.g. `https://your-app.up.railway.app`) and **redeploy** so the proxy is configured. Without it, `/api/*` is not forwarded to any backend.
+2. **Backend up:** Confirm the backend is running (e.g. Railway dashboard, or `curl https://your-backend-url/api/health`). On free tiers the service may sleep; the first request can be slow or time out.
+3. **Same-origin:** The app now uses same-origin `/api` and Next.js rewrites proxy to `NEXT_PUBLIC_API_URL`; no CORS is needed from the browser to the backend.
 
 ## Quick Diagnosis Steps
 
@@ -26,14 +34,14 @@ This error means the frontend cannot connect to the Railway backend API.
 
 ## Common Issues and Fixes
 
-### Issue 1: NEXT_PUBLIC_API_URL Not Set
+### Issue 1: NEXT_PUBLIC_API_URL Not Set (or wrong)
 
 **Symptoms:**
-- Network tab shows requests to `https://diagnostic.kpi99.co/api/organizations/` (same domain)
-- Should be pointing to Railway backend instead
+- Requests go to `https://diagnostic.kpi99.co/api/...` but get 404 or no response
+- The proxy has nowhere to forward requests if `NEXT_PUBLIC_API_URL` is missing at build time
 
 **Fix:**
-1. Get your Railway backend URL:
+1. Get your backend URL (e.g. Railway):
    - Railway Dashboard → Your Service → Settings → Networking
    - Copy the URL (e.g., `https://your-app.up.railway.app`)
 
@@ -44,11 +52,11 @@ This error means the frontend cannot connect to the Railway backend API.
      Name: NEXT_PUBLIC_API_URL
      Value: https://your-app.up.railway.app
      ```
-   - **Important**: No trailing slash, use `https://`
+   - **Important**: No trailing slash, use `https://`. Used at **build time** for the `/api/*` proxy.
 
-3. Redeploy:
+3. Redeploy (required after changing env):
    - Vercel Dashboard → Deployments → Latest → Redeploy
-   - Or push a commit to trigger auto-deploy
+   - Or push a commit to trigger a new build
 
 ### Issue 2: Backend Not Running
 

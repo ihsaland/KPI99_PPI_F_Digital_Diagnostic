@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { organizationsApi, analyticsApi } from '@/lib/api'
+import { organizationsApi, analyticsApi, type IndustryOption } from '@/lib/api'
 import toast from 'react-hot-toast'
 import Header from '@/components/Header'
 import PanAbstract from '@/components/panAbstract'
@@ -25,11 +25,17 @@ export default function AnalyticsPage() {
   const [trends, setTrends] = useState<any>(null)
   const [metrics, setMetrics] = useState<any>(null)
   const [benchmark, setBenchmark] = useState<any>(null)
+  const [industries, setIndustries] = useState<IndustryOption[]>([])
   const [loading, setLoading] = useState(true)
+  const [updatingIndustry, setUpdatingIndustry] = useState(false)
 
   useEffect(() => {
     fetchData()
   }, [organizationId])
+
+  useEffect(() => {
+    analyticsApi.getIndustries().then((res) => setIndustries(Array.isArray(res.data) ? res.data : [])).catch(() => {})
+  }, [])
 
   const fetchData = async () => {
     try {
@@ -47,6 +53,21 @@ export default function AnalyticsPage() {
       toast.error('Failed to load analytics')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleIndustryChange = async (value: string) => {
+    setUpdatingIndustry(true)
+    try {
+      await organizationsApi.update(organizationId, { industry: value || null })
+      setOrganization((o: any) => (o ? { ...o, industry: value || null } : null))
+      const res = await analyticsApi.getBenchmark(organizationId)
+      setBenchmark(res.data)
+      toast.success('Industry updated; benchmark is now normalized for your industry.')
+    } catch (e: any) {
+      toast.error(e.response?.data?.detail || 'Failed to update industry')
+    } finally {
+      setUpdatingIndustry(false)
     }
   }
 
@@ -131,9 +152,26 @@ export default function AnalyticsPage() {
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-6">
             <h2 className="text-2xl font-semibold text-slate-900 mb-6">PPI-F Industry Benchmark Comparison</h2>
             <p className="text-slate-600 mb-4">
-              Compare your PPI-F maturity scores against industry benchmarks to understand how your engineering practices 
-              measure up to peers.
+              Compare your PPI-F maturity scores against industry benchmarks to understand how your engineering practices
+              measure up to peers. Benchmarks are normalized by industry when set.
             </p>
+            <div className="flex flex-wrap items-center gap-4 mb-6">
+              <span className="text-sm text-slate-600">Benchmark industry:</span>
+              <select
+                value={organization?.industry ?? ''}
+                onChange={(e) => handleIndustryChange(e.target.value)}
+                disabled={updatingIndustry}
+                className="px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-800 disabled:opacity-50"
+              >
+                <option value="">All industries (baseline 3.0)</option>
+                {industries.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              {benchmark.industry_label && benchmark.industry_label !== 'All industries' && (
+                <span className="text-sm text-slate-500">Comparing to: {benchmark.industry_label}</span>
+              )}
+            </div>
             <div className="mb-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
@@ -143,7 +181,11 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
                 <div>
-                  <div className="text-sm text-slate-600">Industry Average</div>
+                  <div className="text-sm text-slate-600">
+                    {benchmark.industry_label && benchmark.industry_label !== 'All industries'
+                      ? `${benchmark.industry_label} average`
+                      : 'Industry average'}
+                  </div>
                   <div className="text-3xl font-bold text-slate-600">
                     {benchmark.industry_average.toFixed(2)}/5.0
                   </div>
@@ -151,7 +193,7 @@ export default function AnalyticsPage() {
                 <div>
                   <div className="text-sm text-slate-600">Difference</div>
                   <div className={`text-3xl font-bold ${
-                    benchmark.vs_industry > 0 ? 'text-green-600' : 
+                    benchmark.vs_industry > 0 ? 'text-green-600' :
                     benchmark.vs_industry < 0 ? 'text-red-600' : 'text-slate-600'
                   }`}>
                     {benchmark.vs_industry > 0 ? '+' : ''}{benchmark.vs_industry.toFixed(2)}

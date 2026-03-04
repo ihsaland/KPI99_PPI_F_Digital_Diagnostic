@@ -9,9 +9,15 @@ from app.models import Dimension, QuestionType
 class OrganizationBase(BaseModel):
     name: str
     domain: Optional[str] = None
+    industry: Optional[str] = None
 
 class OrganizationCreate(OrganizationBase):
     pass
+
+class OrganizationUpdate(BaseModel):
+    name: Optional[str] = None
+    domain: Optional[str] = None
+    industry: Optional[str] = None
 
 class Organization(OrganizationBase):
     id: int

@@ -1,24 +1,34 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { organizationsApi } from '@/lib/api'
+import { organizationsApi, analyticsApi, type IndustryOption } from '@/lib/api'
 import toast from 'react-hot-toast'
-import Logo from '@/components/Logo'
+import Header from '@/components/Header'
 
 export default function NewOrganization() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [domain, setDomain] = useState('')
+  const [industry, setIndustry] = useState('')
+  const [industries, setIndustries] = useState<IndustryOption[]>([])
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    analyticsApi.getIndustries().then((res) => setIndustries(Array.isArray(res.data) ? res.data : [])).catch(() => {})
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
     try {
-      const response = await organizationsApi.create({ name, domain: domain || undefined })
+      const response = await organizationsApi.create({
+        name,
+        domain: domain || undefined,
+        industry: industry || undefined,
+      })
       toast.success('Organization created successfully!')
       router.push(`/organizations/${response.data.id}/assessments`)
     } catch (error: any) {
@@ -30,15 +40,9 @@ export default function NewOrganization() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-blue-50 to-slate-50">
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
-          <Link href="/">
-            <Logo size="md" showText={true} />
-          </Link>
-        </div>
-      </header>
+      <Header />
 
-      <main className="container mx-auto px-6 py-12 max-w-2xl">
+      <main className="container mx-auto px-6 pt-28 pb-12 max-w-2xl">
         <Link href="/" className="inline-flex items-center text-slate-600 hover:text-slate-900 mb-6">
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -78,6 +82,23 @@ export default function NewOrganization() {
                 className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition outline-none"
                 placeholder="example.com"
               />
+            </div>
+
+            <div>
+              <label htmlFor="industry" className="block text-sm font-semibold text-slate-700 mb-2">
+                Industry <span className="text-slate-400 text-xs font-normal">(optional, for PPI benchmarking)</span>
+              </label>
+              <select
+                id="industry"
+                value={industry}
+                onChange={(e) => setIndustry(e.target.value)}
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition outline-none bg-white"
+              >
+                <option value="">— Select industry —</option>
+                {industries.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
             </div>
 
             <div className="flex gap-4 pt-4">

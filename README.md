@@ -67,6 +67,15 @@ npm run dev
 
 The frontend will be available at `http://localhost:3000`
 
+### Semi-private access
+
+You can gate the site behind a single shared password so only users with the password can open it. Set:
+
+- `PASSWORD_PROTECTION_ENABLED=true`
+- `SITE_PASSWORD=your-secure-password`
+
+in your frontend environment (e.g. Vercel). See **[SEMI_PRIVATE_SETUP.md](SEMI_PRIVATE_SETUP.md)** for details.
+
 ## Project Structure
 
 ```

@@ -5,9 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { assessmentsApi, questionsApi, Question, Answer } from '@/lib/api'
 import toast from 'react-hot-toast'
-import Logo from '@/components/Logo'
-import Navigation from '@/components/Navigation'
-import MobileMenu from '@/components/MobileMenu'
+import Header from '@/components/Header'
 
 const DIMENSIONS = [
   { value: 'performance', label: 'Performance', color: 'blue', icon: '⚡' },
@@ -225,40 +223,34 @@ export default function AssessmentPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 via-blue-50 to-slate-50">
-      <header className="border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/">
-              <Logo size="md" showText={true} />
+      <Header organizationId={assessment?.organization_id} />
+      <div className="border-b border-slate-200 bg-white/95 backdrop-blur-sm sticky top-20 z-40">
+        <div className="container mx-auto max-w-[1200px] px-5 py-3 flex items-center justify-between gap-4">
+          <span className="text-sm font-medium text-[#334155] truncate">
+            {assessment?.name}
+          </span>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href="/documentation"
+              className="p-2 rounded-lg hover:bg-slate-100 transition text-[#334155] hover:text-blue-600"
+              title="Help & Documentation"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </Link>
-            <div className="flex items-center gap-4">
-              <Navigation />
-              <div className="text-sm text-slate-600 font-medium hidden md:block">
-                {assessment?.name}
-              </div>
-              <Link
-                href="/documentation"
-                className="p-2 rounded-lg hover:bg-slate-100 transition text-slate-600 hover:text-slate-900"
-                title="Help & Documentation"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </Link>
-              <button
-                onClick={() => setShowSidebar(!showSidebar)}
-                className="p-2 rounded-lg hover:bg-slate-100 transition"
-                title="Question List"
-              >
-                <svg className="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-              <MobileMenu />
-            </div>
+            <button
+              onClick={() => setShowSidebar(!showSidebar)}
+              className="p-2 rounded-lg hover:bg-slate-100 transition text-[#334155]"
+              title="Question List"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
           </div>
         </div>
-      </header>
+      </div>
 
       <div className="flex">
         {/* Sidebar Overlay */}

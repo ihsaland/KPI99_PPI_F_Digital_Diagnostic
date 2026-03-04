@@ -18,6 +18,7 @@ import PrioritizationMatrix from '@/components/PrioritizationMatrix'
 import ReportComparison from '@/components/ReportComparison'
 import AssessmentNotes from '@/components/AssessmentNotes'
 import AssessmentTags from '@/components/AssessmentTags'
+import TelemetryConnector from '@/components/TelemetryConnector'
 import PPIFrameworkVisualization from '@/components/PPIFrameworkVisualization'
 import PPIInsights from '@/components/PPIInsights'
 import AIInsights from '@/components/AIInsights'
@@ -655,6 +656,7 @@ export default function ResultsPage() {
               assessmentId={assessmentId}
               initialNotes={summary.assessment.notes}
             />
+            <TelemetryConnector assessmentId={assessmentId} />
           </div>
         )}
 
