@@ -2,6 +2,8 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import Header from '@/components/Header'
+import PanAbstract from '@/components/panAbstract'
 
 export default function UnlockPage() {
   const router = useRouter()
@@ -61,46 +63,55 @@ export default function UnlockPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-slate-50 via-blue-50 to-slate-50 px-4">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg border border-slate-200 p-8">
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-slate-900">PPI-F Diagnostic</h1>
-          <p className="text-slate-600 mt-2">Enter the site password to continue.</p>
-        </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              autoFocus
-              required
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              placeholder="Enter password"
-            />
-          </div>
-          {error && (
-            <p className="text-sm text-red-600" role="alert">
-              {error}
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-blue-50 to-slate-50">
+      <Header />
+      <PanAbstract
+        title="PPI-F Diagnostic"
+        subtitle="Enter your access code to continue to the diagnostic."
+      />
+      <main id="main-content" className="container mx-auto max-w-[1200px] px-6 pt-12 pb-12" role="main">
+        <div className="max-w-md mx-auto">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">Access code</h2>
+            <p className="text-slate-600 text-sm mb-6">
+              If you have an access code, enter it below to continue.
             </p>
-          )}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
-          >
-            {loading ? 'Checking…' : 'Unlock'}
-          </button>
-        </form>
-        <p className="mt-6 text-xs text-slate-500 text-center">
-          This site is semi-private. Contact your administrator for the password.
-        </p>
-      </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
+                  Access code
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  autoFocus
+                  required
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                  placeholder="Enter your access code"
+                />
+              </div>
+              {error && (
+                <p className="text-sm text-red-600" role="alert">
+                  {error}
+                </p>
+              )}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                {loading ? 'Checking…' : 'Continue'}
+              </button>
+            </form>
+            <p className="mt-6 text-sm text-slate-500 text-center">
+              Need an access code? Reach out to your KPI99 contact or the person who shared this link with you.
+            </p>
+          </div>
+        </div>
+      </main>
     </div>
   )
 }
