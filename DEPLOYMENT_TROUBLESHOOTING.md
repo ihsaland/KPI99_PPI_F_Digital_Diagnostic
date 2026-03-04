@@ -17,6 +17,16 @@ Also ensure the **backend** (e.g. Railway) is running and reachable: open `https
 
 ---
 
+## 500 on /api/organizations — "industry" column missing
+
+If the backend returns **500** when loading organizations and logs show a SQL error about `organizations.industry`, the production database was created before the industry column was added. Run the migration **once** against the production DB:
+
+**Preferred: redeploy.** The backend **runs the industry migration automatically on every start** (`start.py`). Redeploy the backend on Railway (push a commit or use “Redeploy” in the dashboard). The migration runs inside Railway’s network where `postgres.railway.internal` resolves, and the column is added if missing.
+
+**If you ran the migration locally** and saw `could not translate host name "postgres.railway.internal"`: that hostname is only valid **inside Railway**. The migration must run on Railway (which is why it’s now part of startup). No need to run it from your machine.
+
+---
+
 ## Local changes not showing in production
 
 If you pushed to Git but production (e.g. diagnostic.kpi99.co) still shows old content, check the following.
