@@ -73,10 +73,13 @@ export default function Home() {
       <main id="main-content" className="container mx-auto px-6 pt-32 pb-12" role="main">
         {/* Hero Section */}
         <div className="text-center mb-16 max-w-3xl mx-auto">
-          <p className="text-lg text-slate-600 mb-8 leading-relaxed">
+          <p className="text-lg text-slate-600 mb-4 leading-relaxed">
             Measure and improve your organization's Performance, Production Readiness,
             Infrastructure Efficiency, and Failure Resilience with KPI99's AI-Augmented Performance Engineering framework.
             Get intelligent anomaly detection, predictive insights, and workload optimization recommendations.
+          </p>
+          <p className="text-slate-600 mb-8 max-w-2xl mx-auto rounded-lg bg-blue-50/80 border border-blue-100 px-4 py-3 text-sm">
+            This diagnostic produces evidence. <a href="https://kpi99.co/en/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline font-medium">KPI99</a> turns it into <strong>prioritized recommendations, roadmaps, and optional workshops</strong>—aligned with FinOps and SRE.
           </p>
           <div className="mb-8">
             <Link

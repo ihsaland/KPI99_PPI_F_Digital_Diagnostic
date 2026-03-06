@@ -6,6 +6,9 @@ export default function Footer() {
           <p className="text-slate-600 text-sm">
             Performance failures are business risks — until they are engineered. Enhanced with AI-Augmented Performance Engineering.
           </p>
+          <p className="text-slate-600 text-sm max-w-xl mx-auto">
+            This diagnostic produces evidence. <a href="https://kpi99.co/en/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 underline font-medium">KPI99</a> turns it into <strong>prioritized recommendations, roadmaps, and optional workshops</strong>—aligned with FinOps and SRE.
+          </p>
           <p className="text-slate-600 text-sm">
             <a
               href="https://kpi99.co/en/privacy.html"
