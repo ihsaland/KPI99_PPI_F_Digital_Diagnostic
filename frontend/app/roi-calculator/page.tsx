@@ -146,7 +146,7 @@ export default function ROICalculatorPage() {
 
     setLoading(true)
     try {
-      const response = await fetch('http://localhost:8001/api/roi/compute', {
+      const response = await fetch('/api/roi/compute', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -226,7 +226,7 @@ export default function ROICalculatorPage() {
       {/* Header Image */}
       <PanAbstract
         title="KPI99 ROI Calculator"
-        subtitle="CFO-ready ROI modeling tool for engineering maturity improvements"
+        subtitle="ROI modeling tool for engineering maturity improvements"
         variant="gradient"
       />
 
