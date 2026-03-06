@@ -30,6 +30,7 @@ export default function UnlockPage() {
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault()
+      if (loading) return
       setError('')
       setLoading(true)
       try {
@@ -43,8 +44,9 @@ export default function UnlockPage() {
           setError(data.error || 'Invalid password')
           return
         }
-        router.push(from)
-        router.refresh()
+        // Full page navigation so the next request reliably includes the new cookie (avoids double-submit)
+        window.location.href = from
+        return
       } catch {
         setError('Something went wrong. Please try again.')
       } finally {
