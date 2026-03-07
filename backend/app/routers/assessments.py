@@ -16,6 +16,8 @@ from app.services.ai_diagnostics import AIDiagnosticsService
 
 router = APIRouter()
 
+
+@router.post("", response_model=schemas.Assessment)
 @router.post("/", response_model=schemas.Assessment)
 def create_assessment(
     assessment: schemas.AssessmentCreate,
