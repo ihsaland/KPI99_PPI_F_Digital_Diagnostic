@@ -20,6 +20,14 @@ except Exception as e:
     import logging
     logging.warning("Industry migration skipped or failed: %s", e)
 
+# Seed questions if the database has none (idempotent)
+try:
+    from app.init_questions import init_questions
+    init_questions()
+except Exception as e:
+    import logging
+    logging.warning("Question init skipped or failed: %s", e)
+
 app = FastAPI(
     title="KPI99 PPI-F Digital Diagnostic Tool API",
     description="Digital diagnostic tool for Performance, Production Readiness, Infrastructure Efficiency, and Failure Resilience. Complete API documentation with webhook support and integrations.",
