@@ -19,7 +19,7 @@ Also ensure the **backend** (e.g. Railway) is running and reachable: open `https
 
 ## 500 on /api/organizations — "industry" column missing
 
-If the backend returns **500** when loading organizations and logs show a SQL error about `organizations.industry`, the production database was created before the industry column was added. Run the migration **once** against the production DB:
+If the backend returns **500** when loading organizations and logs show a SQL error about `organizations.industry`, the production database was created before the industry column was added. The migration runs automatically when the app starts (in both `start.py` and `main.py`). Redeploy the backend so it runs:
 
 **Preferred: redeploy.** The backend **runs the industry migration automatically on every start** (`start.py`). Redeploy the backend on Railway (push a commit or use “Redeploy” in the dashboard). The migration runs inside Railway’s network where `postgres.railway.internal` resolves, and the column is added if missing.
 

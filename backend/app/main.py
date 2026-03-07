@@ -12,6 +12,14 @@ from app.routers import assessments, questions, organizations, reports, uploads,
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
+# Ensure industry column exists (idempotent; required for organizations in production)
+try:
+    from app.migrate_add_industry import migrate
+    migrate()
+except Exception as e:
+    import logging
+    logging.warning("Industry migration skipped or failed: %s", e)
+
 app = FastAPI(
     title="KPI99 PPI-F Digital Diagnostic Tool API",
     description="Digital diagnostic tool for Performance, Production Readiness, Infrastructure Efficiency, and Failure Resilience. Complete API documentation with webhook support and integrations.",
