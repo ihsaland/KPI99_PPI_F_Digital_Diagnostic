@@ -14,6 +14,8 @@ from datetime import datetime
 
 router = APIRouter()
 
+
+@router.post("", response_model=schemas.Organization)
 @router.post("/", response_model=schemas.Organization)
 def create_organization(
     organization: schemas.OrganizationCreate,
