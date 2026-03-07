@@ -11,6 +11,8 @@ from app.models import Dimension
 
 router = APIRouter()
 
+
+@router.get("", response_model=List[schemas.Question])
 @router.get("/", response_model=List[schemas.Question])
 def list_questions(
     dimension: Dimension = None,
